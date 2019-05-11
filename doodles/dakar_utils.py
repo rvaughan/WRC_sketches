@@ -29,7 +29,7 @@ def getTime(ts, ms=False):
         ts=str(1000*int(ts.split(' ')[0]))
     t=ts.split(':')
     if len(t)==3:
-        tm=60*int(t[0])+60*int(t[1])+float(t[2])
+        tm=3600*int(t[0])+60*int(t[1])+float(t[2])
     elif len(t)==2:
         tm=60*int(t[0])+float(t[1])
     else:
@@ -279,18 +279,26 @@ def setup_screenshot(driver,path):
     driver.set_window_size(original_size['width'], original_size['height'])
 
 
-def getTableImage(url, fn='dummy_table', basepath='.', path='.', delay=5, scale_factor=2, height=420, width=800):
+def getTableImage(url, fn='dummy_table', basepath='.', path='.',
+                  delay=None, scale_factor=2, height=420, width=800, headless=True):
     ''' Render HTML file in browser and grab a screenshot. '''
     
+    #options = Options()
+    #options.headless = True
+
     opt = webdriver.ChromeOptions()
     opt.add_argument('--force-device-scale-factor={}'.format(scale_factor))
-
+    if headless:
+        opt.add_argument('headless')
+        
     browser = webdriver.Chrome(options=opt)
     
     #browser.set_window_size(width, height)
     browser.get(url)
     #Give the map tiles some time to load
-    time.sleep(delay)
+    #Should really do this with some sort of browseronload check
+    if delay is not None:
+        time.sleep(delay)
     imgpath='{}/{}.png'.format(path,fn)
     imgfn = '{}/{}'.format(basepath, imgpath)
     imgfile = '{}/{}'.format(os.getcwd(),imgfn)
